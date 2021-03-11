@@ -1,6 +1,6 @@
 package networks;
 
-network chain_6_1_1_network extends base_network{
+network chain_6_1_1_datarate_network extends base_network{
 
 
     parameters:
