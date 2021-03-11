@@ -2,7 +2,7 @@ package modules.content;
 
 simple content_distribution like IContentDistribution{
     parameters:
-		double file_size = default (10);
+		int file_size = default (10);
 			int objects = default (100);
 		double alpha = default (1);
 		double q = default(0);

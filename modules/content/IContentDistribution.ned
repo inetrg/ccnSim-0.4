@@ -3,7 +3,7 @@ package modules.content;
 //<aa>
 moduleinterface IContentDistribution {
     parameters:
-		double file_size;
+		int file_size;
 			int objects;
 		double alpha;
 		double q;
