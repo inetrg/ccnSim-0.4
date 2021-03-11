@@ -222,7 +222,8 @@ void strategy_layer::populate_routing_table()
 		if (dest != getParentModule()->getIndex())	// Skip ourself.
 		{
 			cTopology::Node *to   = topo.getNode( dest );  	// Get the target node.
-			topo.weightedMultiShortestPathsTo( to );		// Results are stored inside the cTopology object.
+            throw cRuntimeError("TODO");
+			//topo.weightedMultiShortestPathsTo( to );		// Results are stored inside the cTopology object.
 			if (node->getNumPaths() == 0)					// The current node does not have any path to reach the target.
 			{
 				cout << "strategy_layer.cc:"<<__LINE__<<": ERROR: No paths connecting"

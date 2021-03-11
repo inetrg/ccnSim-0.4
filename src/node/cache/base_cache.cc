@@ -38,9 +38,9 @@
 #include "ccn_data_m.h"
 
 #include "fix_policy.h"
-#include "ideal_blind_policy.h"
-#include "costaware_policy.h"
-#include "ideal_costaware_policy.h"
+#include "cost_related_decision_policies/ideal_blind_policy.h"
+#include "cost_related_decision_policies/costaware_policy.h"
+#include "cost_related_decision_policies/ideal_costaware_policy.h"
 #include "error_handling.h"
 
 #include "two_lru_policy.h"

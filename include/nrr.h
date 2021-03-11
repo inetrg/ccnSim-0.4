@@ -59,7 +59,7 @@ class nrr: public MonopathStrategyLayer{
 	void finish();
     private:
 	unordered_map<name_t,int_f> dynFIB;
-	unordered_set<chunk_t> ghost_list;
+    boost::unordered::unordered_set<chunk_t> ghost_list;
 	vector<Centry> cfib;
 	int TTL;
 

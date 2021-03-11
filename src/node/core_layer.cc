@@ -975,7 +975,9 @@ int	core_layer::send_data(ccn_data* msg, const char *gatename, int gateindex, in
 		}
 	}
 	#endif
-	return send (msg, gatename, gateindex);
+	send (msg, gatename, gateindex);
+    /* TODO: Check what to do here... */
+    return 0;
 }
 
 int core_layer::getOutInt(int dest)

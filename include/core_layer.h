@@ -53,7 +53,7 @@ class base_cache;
 struct pit_entry
 {
     interface_t interfaces;			// Incoming interfaces.
-    unordered_set<int> nonces;		// Nonces of the Interest packets aggregated inside the same PIT entry.
+    boost::unordered::unordered_set<int> nonces;		// Nonces of the Interest packets aggregated inside the same PIT entry.
     simtime_t time; 				// Last update time of the PIT entry.
     std::bitset<1> cacheable;		// Bit indicating if the retrieved Data packet should be cached or not.
 };
