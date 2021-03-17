@@ -105,7 +105,7 @@ class abstract_node: public cSimpleModule{
 
         //<aa>  If there is a client attached to the specified interface, it will be returned.
         //              Otherwise a null pointer will be returned
-        cSimpleModule* __get_attached_client(int interface)
+        client * __get_attached_client(int interface)
         {
             client *c = dynamic_cast<client *>
                         (getParentModule()->gate("face$o",interface)->getNextGate()->getOwnerModule());
