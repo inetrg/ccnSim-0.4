@@ -35,7 +35,7 @@ To install ccnSim-0.4, please follow the instructions in INSTALL.txt (or use the
 After having successfully installed ccnSim, you can run your first simulation from the command line 
 with the following command:
 
-	./ccnSim -u Cmdenv -f ED_TTL-omnetpp.ini r 0
+	./ccnSim -u Cmdenv -f ED_TTL-omnetpp.ini -r 0
 
 In this case, the default ED_TTL-omnetpp.ini file will be used to execute a sample simulation. 
 Each parameter in ED_TTL-omnetpp.ini is documented with the aim of providing a complete understanding of the features of the simulator and of the relative simple scenario that is simulated. 
