@@ -205,15 +205,15 @@ void strategy_layer::handleMessage(cMessage *in)
 void strategy_layer::populate_routing_table()
 {
     deque<int> p;
-    cTopology topo;
+    cTopology_mod topo;
     vector<string> types;
 
     // Extract topology map
     types.push_back("modules.node.node");		// We are interested in getting all nodes.
     topo.extractByNedTypeName( types );
-    cTopology::Node *node = topo.getNode( getParentModule()->getIndex() ); 	// Taking the reference to the current node.
+    cTopology_mod::Node *node = topo.getNode( getParentModule()->getIndex() ); 	// Taking the reference to the current node.
 
-    // As the node topology is defined as a vector of nodes (see Omnet++ manual), cTopology
+    // As the node topology is defined as a vector of nodes (see Omnet++ manual), cTopology_mod
     // associates the node i with the node whose Index is i.
 
 	// Find shortest paths from all nodes towards the target node 'dest'.
@@ -221,9 +221,8 @@ void strategy_layer::populate_routing_table()
     {
 		if (dest != getParentModule()->getIndex())	// Skip ourself.
 		{
-			cTopology::Node *to   = topo.getNode( dest );  	// Get the target node.
-            throw cRuntimeError("TODO");
-			//topo.weightedMultiShortestPathsTo( to );		// Results are stored inside the cTopology object.
+			cTopology_mod::Node *to   = topo.getNode( dest );  	// Get the target node.
+			topo.weightedMultiShortestPathsTo( to );		// Results are stored inside the cTopology_mod object.
 			if (node->getNumPaths() == 0)					// The current node does not have any path to reach the target.
 			{
 				cout << "strategy_layer.cc:"<<__LINE__<<": ERROR: No paths connecting"

@@ -31,15 +31,11 @@
 #ifndef STATISTICS_H_
 #define STATISTICS_H_
 #include <omnetpp.h>
-#if OMNETPP_VERSION < 0x0500
-    #include <ctopology.h>
-#else
-    #include <omnetpp/ctopology.h>
-#endif
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
 #include <vector>
 #include <chrono>
+#include "ctopology_mod.h"
 
 
 class client;
