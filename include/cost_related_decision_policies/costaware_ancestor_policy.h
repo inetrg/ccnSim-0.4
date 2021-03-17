@@ -60,14 +60,14 @@ class Costaware_ancestor: public DecisionPolicy{
 			cTopology topo;
 	   		topo.extractByNedTypeName(ctype);
 
-
-			#ifdef SEVERE_DEBUG
-				if (num_content_distribution_modules != 1){
-					std::stringstream msg; 
-					msg<<"Found "<< num_content_distribution_modules << ". It MUST be 1";
-					severe_error(__FILE__, __LINE__, msg.str().c_str() );
-				}
-			#endif
+			// PK: num_content_distribution_modules undeclared. what is it supposted to be???
+			// #ifdef SEVERE_DEBUG
+			// 	if (num_content_distribution_modules != 1){
+			// 		std::stringstream msg;
+			// 		msg<<"Found "<< num_content_distribution_modules << ". It MUST be 1";
+			// 		severe_error(__FILE__, __LINE__, msg.str().c_str() );
+			// 	}
+			// #endif
 
 			cTopology::Node *content_distribution_node = topo.getNode(0);
 			content_distribution_module = 
