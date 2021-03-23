@@ -2,6 +2,7 @@ package modules.node;
 import modules.node.strategy.*;
 import modules.node.cache.*;
 import modules.node.Inode;
+import modules.node.face_dsme;
 
 
 module node like Inode{
@@ -22,10 +23,13 @@ module node like Inode{
 	core_layer : core_layer;
 	strategy_layer : < "modules.node.strategy." + FS > like strategy;
 	content_store : < "modules.node.cache." + RS > like cache;
+	face_dsme : face_dsme;
 
     connections :
 	for i=0..sizeof(face)-1{
-	    core_layer.face++ <--> face [i];
+		// core_layer.face++ <--> face [i];
+		core_layer.face++ <--> face_dsme.upper_layer++;
+		face_dsme.lower_layer++ <--> face [i];
 	}
 
 	core_layer.client_port <--> client_port;
