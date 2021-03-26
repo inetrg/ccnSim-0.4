@@ -167,6 +167,12 @@ void content_distribution::initialize()
     init_content();
     cout<<"Content initialized"<<endl;
 
+	for (int d = 1; d <= newCardF; d++)
+	{
+		// PK: this doesn't seem to be printed :/
+		EV << "Content # " << d << endl;
+	}
+
 	finalize_total_replica();
 }
 

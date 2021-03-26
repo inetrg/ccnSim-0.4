@@ -115,6 +115,16 @@ void strategy_layer::initialize()
 		//scheduleAt(simTime() + fail_time + fail_duration + fail_transient, new_routes);
 	}
 
+	// EV << "FIB:\n";
+	// for (auto &it : FIB)
+	// {
+	// 	EV << "first: " << it.first << "\n";
+	// 	for (auto &i : it.second) // it.second is the vector
+	// 	{
+	// 		EV << "interface ID: " << i.id ;
+	// 		EV << "; path len to dst: " << i.len << "\n";
+	// 	}
+	// }
 }
 
 void strategy_layer::finish()
@@ -284,6 +294,7 @@ void strategy_layer::populate_from_file()
  */
 void strategy_layer::add_FIB_entry(int destination_node_index, int interface_index, int distance)
 {
+	EV << "add_FIB_entry ; dst node idx: " << destination_node_index << " ; if idx: " << interface_index << " ; distance to dst: " << distance << "\n";
 	int_f FIB_entry;
 	FIB_entry.id = interface_index;
 	FIB_entry.len = distance;
