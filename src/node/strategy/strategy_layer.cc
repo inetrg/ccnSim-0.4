@@ -219,8 +219,9 @@ void strategy_layer::populate_routing_table()
     vector<string> types;
 
     // Extract topology map
-    types.push_back("modules.node.node");		// We are interested in getting all nodes.
-    topo.extractByNedTypeName( types );
+    // types.push_back("modules.node.node");		// We are interested in getting all nodes.
+	types.push_back("ccnsim_dsme.ccnsim_dsme_node");
+	topo.extractByNedTypeName( types );
     cTopology_mod::Node *node = topo.getNode( getParentModule()->getIndex() ); 	// Taking the reference to the current node.
 
     // As the node topology is defined as a vector of nodes (see Omnet++ manual), cTopology_mod

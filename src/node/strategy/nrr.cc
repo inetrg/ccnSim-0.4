@@ -55,8 +55,9 @@ struct lookup_len{
 void nrr::initialize(){
     strategy_layer::initialize();
     vector<string> ctype;
-    ctype.push_back("modules.node.node");
-    TTL = par("TTL2");
+    // ctype.push_back("modules.node.node");
+	ctype.push_back("ccnsim_dsme.ccnsim_dsme_node");
+	TTL = par("TTL2");
 
     cTopology topo;
     topo.extractByNedTypeName(ctype);

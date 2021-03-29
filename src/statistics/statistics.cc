@@ -191,7 +191,8 @@ void statistics::initialize(int stage)
 		// Extracting cache and core modules.
 		caches = new base_cache*[num_nodes];
 		cores = new core_layer*[num_nodes];
-		vector<string> nodes_vec(1,"modules.node.node");
+		// vector<string> nodes_vec(1,"modules.node.node");
+		vector<string> nodes_vec(1, "ccnsim_dsme.ccnsim_dsme_node");
 		topo.extractByNedTypeName(nodes_vec);
 
 		for (int i = 0;i<topo.getNumNodes();i++)
