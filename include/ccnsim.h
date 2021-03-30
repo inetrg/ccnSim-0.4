@@ -17,7 +17,8 @@
 //</aa>
 
 //System packets
-#define CCN_I 100   //ccn interest 
+#define CCN_I 100   //ccn interest
+#define INDICATION 101 // PK indication message
 #define CCN_D 200   //ccn data 
 #define GHOST 5    //ghost interest
 

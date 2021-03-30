@@ -217,6 +217,9 @@ void core_layer::handleMessage(cMessage *in)
 		handle_data(data_msg);
 		delete in;
 		break;
+	case INDICATION:
+		EV << "RX INDICATION PACKET\n";
+		break;
 
     case LOAD_CHECK:
     	evaluateLinkLoad();
