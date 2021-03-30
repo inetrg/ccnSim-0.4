@@ -16,9 +16,9 @@ module node like Inode{
 
 	@display("i=abstract/router;is=s");
     gates:
-	inout face[];	
+	inout face[];
 	inout client_port;
-	inout data_face[];
+	inout data_face;
 
     submodules:
 	core_layer : core_layer;
@@ -34,9 +34,9 @@ module node like Inode{
 		// core_layer.face++ <--> face [i];
 		core_layer.face++ <--> face_dsme.upper_layer++;
 		// face_dsme.lower_layer++ <--> face [i];
-		// data faces have no connection to client so they start at idx 0
-		face_dsme.lower_layer++ <--> data_face [i-1];
 	}
+
+	face_dsme.lower_layer <--> data_face;
 
 
 	core_layer.client_port <--> client_port;

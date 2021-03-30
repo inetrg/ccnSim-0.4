@@ -7,5 +7,5 @@ simple face_dsme
 
     gates:
         inout upper_layer[];
-        inout lower_layer[];
+        inout lower_layer;
 }
