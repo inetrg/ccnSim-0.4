@@ -18,6 +18,7 @@ module node like Inode{
     gates:
 	inout face[];	
 	inout client_port;
+	inout data_face[];
 
     submodules:
 	core_layer : core_layer;
@@ -25,12 +26,18 @@ module node like Inode{
 	content_store : < "modules.node.cache." + RS > like cache;
 	face_dsme : face_dsme;
 
-    connections :
-	for i=0..sizeof(face)-1{
+	connections allowunconnected:
+	// PK: keep connection of face[0] for client
+	core_layer.face++ <--> face[0];
+
+	for i=1..sizeof(face)-1{
 		// core_layer.face++ <--> face [i];
 		core_layer.face++ <--> face_dsme.upper_layer++;
-		face_dsme.lower_layer++ <--> face [i];
+		// face_dsme.lower_layer++ <--> face [i];
+		// data faces have no connection to client so they start at idx 0
+		face_dsme.lower_layer++ <--> data_face [i-1];
 	}
+
 
 	core_layer.client_port <--> client_port;
 	core_layer.cache_port  <--> content_store.cache_port;
