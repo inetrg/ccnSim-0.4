@@ -72,7 +72,24 @@ void  core_layer::initialize()
 	{
 		if (content_distribution::repositories[i] == getIndex() )
 		{
-			#ifdef SEVERE_DEBUG
+			EV << "I AM REPO\n";
+			// j is coutner and content name?
+			int j = 0;
+			for (auto c = content_distribution::catalog.begin(); c != content_distribution::catalog.end(); ++c) {
+				// EV << "__info  " << __info(j) << "\n";
+				// EV << "__size  " << __size(j) << "\n";
+				unsigned short bitmask = (1 << i);
+
+				if (bitmask & __repo(j))
+				{
+					EV << "My contents:  " << j << "\n";
+				}
+				j++;
+			}
+				// b) Lookup inside the attached repo if I am supposed to be the source for the requested content.
+				// if (my_bitmask & __repo(int_msg->get_name()))
+
+#ifdef SEVERE_DEBUG
 				it_has_a_repo_attached = true;
 			#endif
 
@@ -83,9 +100,9 @@ void  core_layer::initialize()
 	}
     my_bitmask = (1<<i);	// Recall that the width of the repository bitset is only num_repos.
 
-    // Initialize pointers to Content Store and Strategy Layer.
-    ContentStore = (base_cache *) gate("cache_port$o")->getNextGate()->getOwner();
-    strategy = (strategy_layer *) gate("strategy_port$o")->getNextGate()->getOwner();
+		// Initialize pointers to Content Store and Strategy Layer.
+		ContentStore = (base_cache *)gate("cache_port$o")->getNextGate()->getOwner();
+	strategy = (strategy_layer *) gate("strategy_port$o")->getNextGate()->getOwner();
 
 	clear_stat();
 

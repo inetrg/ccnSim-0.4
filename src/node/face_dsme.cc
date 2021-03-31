@@ -20,7 +20,7 @@
     void face_dsme::initialize()
     {
         // Initialize is called at the beginning of the simulation.
-        EV << "INIT face_dsme" << "\n";
+        // EV << "INIT face_dsme" << "\n";
     }
 
     void face_dsme::handleMessage(cMessage *msg)

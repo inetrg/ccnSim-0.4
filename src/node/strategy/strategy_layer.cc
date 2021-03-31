@@ -294,7 +294,7 @@ void strategy_layer::populate_from_file()
  */
 void strategy_layer::add_FIB_entry(int destination_node_index, int interface_index, int distance)
 {
-	EV << "add_FIB_entry ; dst node idx: " << destination_node_index << " ; if idx: " << interface_index << " ; distance to dst: " << distance << "\n";
+	// EV << "add_FIB_entry ; dst node idx: " << destination_node_index << " ; if idx: " << interface_index << " ; distance to dst: " << distance << "\n";
 	int_f FIB_entry;
 	FIB_entry.id = interface_index;
 	FIB_entry.len = distance;

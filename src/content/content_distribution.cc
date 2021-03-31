@@ -170,7 +170,7 @@ void content_distribution::initialize()
 	for (int d = 1; d <= newCardF; d++)
 	{
 		// PK: this doesn't seem to be printed :/
-		EV << "Content # " << d << endl;
+		// EV << "Content # " << d << endl;
 	}
 
 	finalize_total_replica();
