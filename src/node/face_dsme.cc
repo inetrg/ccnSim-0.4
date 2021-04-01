@@ -1,6 +1,13 @@
 #include <string.h>
 #include <omnetpp.h>
 
+#include "inet_ccn_interest_m.h"
+#include "inet/common/packet/Packet.h"
+
+#include "ccn_data.h"
+#include "ccn_interest.h"
+
+
     using namespace omnetpp;
 
     /**
@@ -32,7 +39,6 @@
         // EV << msg->getArrivalGate()->str() << "\n";
 
 
-        cPacket *casted_msg = check_and_cast<cPacket *>(msg);
 
         // simply forward message to the same gate number
         std::string str = msg->getArrivalGate()->getFullName();
@@ -44,7 +50,28 @@
         }
         else {
             EV << "RX from upper, send down;" << str << "\n";
-            int arrival_gate = msg->getArrivalGate()->getIndex();
+
+            char msgName[32];
+            int numSent = 666;
+            sprintf(msgName, "face_dsme", numSent);
+            auto packet = new inet::Packet(msgName);
+
+            switch (msg->getKind())
+            {
+                case CCN_D:
+                    break;
+
+                case CCN_I:
+                    ccn_interest *tmp_int = (ccn_interest *)msg;
+                    auto payload = inet::makeShared<inet::inet_ccn_interest>();
+                    payload->setChunk(tmp_int->getChunk());
+                    break;
+                default:
+                    EV << "UNKNOWN MSG TYPE";
+            }
+
+
+                int arrival_gate = msg->getArrivalGate()->getIndex();
             send(msg, "lower_layer$o");
             // send(msg, "lower_layer$o", msg->getArrivalGate()->getIndex());
         }
