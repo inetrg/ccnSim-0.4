@@ -32,15 +32,20 @@
         // EV << msg->getArrivalGate()->str() << "\n";
 
 
+        cPacket *casted_msg = check_and_cast<cPacket *>(msg);
+
         // simply forward message to the same gate number
         std::string str = msg->getArrivalGate()->getFullName();
         if (str.find("lower") != std::string::npos)
         {
             EV << "RX from lower, send up;" << str  << "\n";
+            // find out dst face and send msg there
             send(msg, "upper_layer$o", msg->getArrivalGate()->getIndex());
         }
         else {
             EV << "RX from upper, send down;" << str << "\n";
-            send(msg, "lower_layer$o", msg->getArrivalGate()->getIndex());
+            int arrival_gate = msg->getArrivalGate()->getIndex();
+            send(msg, "lower_layer$o");
+            // send(msg, "lower_layer$o", msg->getArrivalGate()->getIndex());
         }
     }
