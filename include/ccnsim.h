@@ -27,6 +27,9 @@
 #define ARRIVAL_TTL 350 //arrival of a request for the ModelGraft scenario
 #define TIMER 400   //arrival of a request 
 
+//PK indication timer
+#define TIMER_INDICATION 401 //arrival of a request
+
 //Statistics timers
 #define FULL_CHECK 2000
 #define STABLE_CHECK 3000

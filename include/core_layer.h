@@ -65,9 +65,9 @@ class core_layer : public abstract_node{
     public:
     	void check_if_correct(int line);
 
-    	#ifdef SEVERE_DEBUG
 		bool it_has_a_repo_attached;
 
+    	#ifdef SEVERE_DEBUG
 		vector<int> get_interfaces_in_PIT(chunk_t chunk);
 		bool is_it_initialized;
 		#endif
@@ -143,8 +143,10 @@ class core_layer : public abstract_node{
 		static int repo_interest; 	// Total number of Interest packets sent to the attached repository (if present)
 
 		// Number of chunks satisfied by the attached repository (if present).
-		int repo_load; 
-	
+		int repo_load;
+
+		std::vector<int> my_contents;
+		int count_indications=0;
 
 		// Architecture data structures
 		boost::unordered_map <chunk_t, pit_entry > PIT;
@@ -161,8 +163,10 @@ class core_layer : public abstract_node{
 		cMessage *load_check;
 		void evaluateLinkLoad();
 
+		// PK indication timer
+		cMessage *timer_indication;
 
-		#ifdef SEVERE_DEBUG
+#ifdef SEVERE_DEBUG
 		int unsolicited_data;	// Data received by the node but not requested by anyone
 
 		int discarded_interests; //number of incoming interests discarded
