@@ -115,16 +115,20 @@ void strategy_layer::initialize()
 		//scheduleAt(simTime() + fail_time + fail_duration + fail_transient, new_routes);
 	}
 
-	// EV << "FIB:\n";
-	// for (auto &it : FIB)
-	// {
-	// 	EV << "first: " << it.first << "\n";
-	// 	for (auto &i : it.second) // it.second is the vector
-	// 	{
-	// 		EV << "interface ID: " << i.id ;
-	// 		EV << "; path len to dst: " << i.len << "\n";
-	// 	}
-	// }
+	EV << "FIB:\n";
+	for (auto &it : FIB)
+	{
+		EV << "neigh: " << it.first;
+		for (auto &i : it.second) // it.second is the vector
+		{
+			EV << " ; over neigh with ID: " << i.id ;
+			EV << " ; path len to dst: " << i.len << "\n";
+		}
+	}
+	for (auto &it : gatelu)
+	{
+		EV << "neigh with ID: " << it.second << " is node[" << it.first << "]\n";
+	}
 }
 
 void strategy_layer::finish()

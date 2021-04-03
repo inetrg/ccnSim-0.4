@@ -56,6 +56,7 @@ struct pit_entry
     boost::unordered::unordered_set<int> nonces;		// Nonces of the Interest packets aggregated inside the same PIT entry.
     simtime_t time; 				// Last update time of the PIT entry.
     std::bitset<1> cacheable;		// Bit indicating if the retrieved Data packet should be cached or not.
+	std::bitset<1> needs_indication;// PK: when this is set, an uplink indication should be sent
 };
 
 
@@ -134,6 +135,7 @@ class core_layer : public abstract_node{
 		int numPercentiles = 11;
 
     private:
+		void send_interest_indication(chunk_t chunk, int ogate_idx);
 		unsigned long max_pit;
 		unsigned short nodes;
 		unsigned int my_bitmask;

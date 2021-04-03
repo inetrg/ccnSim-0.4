@@ -192,7 +192,19 @@ void core_layer::initialize()
 	}
 }
 
-/*
+void core_layer::send_interest_indication(chunk_t chunk, int ogate_idx)
+{
+
+	ccn_interest *interest_indication = new ccn_interest("interest_indication", INDICATION);
+
+	interest_indication->setChunk(chunk);
+	// interest_indication->setHops(-1);
+	// interest_indication->setTarget(-1);
+
+	send(interest_indication, "face$o", ogate_idx); // 0 is client, 1 is node[0] in star. hard coded!!!
+}
+
+	/*
  * 	Core layer handling message. The received packet is classified (Interest or Data)
  * 	and the respective handling functions are called.
  */
@@ -248,6 +260,8 @@ void core_layer::handleMessage(cMessage *in)
 		evaluateLinkLoad();
 		scheduleAt(simTime() + maxInterval, in);
 		break;
+
+	// send periodic indications from repo nodes
 	case TIMER_INDICATION:
 
 		if (it_has_a_repo_attached)
@@ -257,29 +271,54 @@ void core_layer::handleMessage(cMessage *in)
 			float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 			scheduleAt(simTime() + r, timer_indication);
 
-			// cMessage *msg = new cMessage("MYTESTMESSAGE");
-
-			ccn_interest *interest_indication = new ccn_interest("interest_indication", INDICATION);
-
 			chunk_t chunk = 0;
 			__sid(chunk, my_contents[count_indications % my_contents.size()]);
 			__schunk(chunk, 0);
-
-			// int abcd = my_contents[count_indications % my_contents.size()];
-			// EV << "count_indications: " << count_indications << "\n";
-			// EV << "my_contents.size(): " << my_contents.size() << "\n";
-			// EV << "count_indications % my_contents.size(): " << count_indications % my_contents.size() << "\n";
-			// interest_indication->setChunk(my_contents[count_indications % my_contents.size()]);
-			
-			interest_indication->setChunk(chunk);
-			// interest_indication->setHops(-1);
-			// interest_indication->setTarget(-1);
-
-			send(interest_indication, "face$o", 0);
+			send_interest_indication(chunk, 1);
 			count_indications++;
-
-			// msg->setKind(INDICATION);
 		}
+		break;
+
+	case INDICATION:
+		ccn_interest *incoming_msg = (ccn_interest *)in;
+		EV << "node [" << getIndex() << "]: CORE INDICATION MESSAGE\n";
+		EV << " int_message->getChunk(): " << incoming_msg->getChunk() << "\n";
+		EV << " int_message->get_name(): " << incoming_msg->get_name() << "\n";
+
+		ccn_interest *int_message = new ccn_interest("interest", CCN_I);
+
+
+		// copy chunk name from incoming interest
+		chunk_t chunk = incoming_msg->getChunk();
+		int_message->setChunk(chunk);
+
+		unordered_map<chunk_t, pit_entry>::iterator pitIt = PIT.find(chunk);
+
+		// Invalidate and re-create a new PIT entry.
+		if (pitIt != PIT.end()) {
+			PIT.erase(chunk);
+		}
+
+		PIT[chunk].time = simTime();
+		PIT[chunk].cacheable.set();
+		// set indication bit in PIT which triggers an uplink interest notification after data arrival
+		PIT[chunk].needs_indication.set();
+
+		// if (int_msg->getTarget() == getIndex())
+		// { // I am the target of this interest but I have no more the object
+			// Therefore, this interest cannot be aggregated with the others
+			// int_msg->setAggregate(false);
+		// }
+
+		bool *decision = strategy->get_decision(int_message);
+		handle_decision(decision, int_message);
+		delete[] decision; //free memory for the decision array
+
+		// PK: not needed since i am the "originator" of this interest
+		// add_to_pit(chunk, incoming_msg->getArrivalGate()->getIndex());
+
+		// delete oroginal interest notification message
+		delete in;
 		break;
 	}
 
@@ -327,6 +366,8 @@ void core_layer::finish()
 		recordScalar(name, repo_interest);
 		repo_interest = 0;
 	}
+	//
+	cancelAndDelete(timer_indication);
 }
 
 /*
@@ -753,6 +794,12 @@ void core_layer::handle_data(ccn_data *data_msg)
 			}
 			i++;
 			interfaces >>= 1;
+		}
+
+		// send indication if pit match has indication bit set
+		if(pitIt->second.needs_indication.test(0)) {
+			EV << "node[" << getIndex() << "]: Send indication from cache\n ";
+			send_interest_indication(chunk, 0); // hard coded 0 sends to client in star topology
 		}
 	}
 
