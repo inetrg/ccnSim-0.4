@@ -38,7 +38,7 @@
         // EV << msg->getArrivalGate()->getFullName() << "\n";
         // EV << msg->getArrivalGate()->str() << "\n";
 
-
+        EV << "node["<<getIndex()<<"]: face_dsme::handleMessage\n";
 
         // simply forward message to the same gate number
         std::string str = msg->getArrivalGate()->getFullName();
@@ -66,6 +66,8 @@
                     ccn_interest *tmp_int = (ccn_interest *)msg;
                     auto payload = inet::makeShared<inet::inet_ccn_interest>();
                     payload->setChunk(tmp_int->getChunk());
+
+                    packet->insertAtBack(payload);
                     break;
                 }
                 default:
@@ -74,7 +76,8 @@
 
 
                 int arrival_gate = msg->getArrivalGate()->getIndex();
-            send(msg, "lower_layer$o");
-            // send(msg, "lower_layer$o", msg->getArrivalGate()->getIndex());
+                send(packet, "lower_layer$o");
+                delete msg;
+                // send(msg, "lower_layer$o", msg->getArrivalGate()->getIndex());
         }
     }
