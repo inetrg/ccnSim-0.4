@@ -62,10 +62,12 @@
                     break;
 
                 case CCN_I:
+                {
                     ccn_interest *tmp_int = (ccn_interest *)msg;
                     auto payload = inet::makeShared<inet::inet_ccn_interest>();
                     payload->setChunk(tmp_int->getChunk());
                     break;
+                }
                 default:
                     EV << "UNKNOWN MSG TYPE";
             }

@@ -8,9 +8,8 @@ cplusplus {{
 namespace inet;
 
 class inet_ccn_interest extends FieldsChunk{
-	@customize(true);
 	@fieldNameSuffix("_var");
-	abstract int path[];//for source routed path (@deprecated)
+	int path[];//for source routed path (@deprecated)
 
 	uint64_t chunk; //Actual downloading chunk (name+chunk number=64 bit)
 	int hops = 0; //Hop counter
