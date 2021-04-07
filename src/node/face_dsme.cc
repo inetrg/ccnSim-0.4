@@ -3,6 +3,9 @@
 
 #include "inet_ccn_interest_m.h"
 #include "inet/common/packet/Packet.h"
+#include "inet/linklayer/common/InterfaceTag_m.h"
+#include "inet/networklayer/common/NetworkInterface.h"
+#include "inet/linklayer/common/MacAddressTag_m.h"
 
 #include "ccn_data.h"
 #include "ccn_interest.h"
@@ -75,7 +78,18 @@
             }
 
 
-                int arrival_gate = msg->getArrivalGate()->getIndex();
+                std::stringstream wss;
+                int index = msg->getArrivalGate()->getIndex();
+
+                wss << "host[" << index << "]";
+
+                inet::NetworkInterface *netif = check_and_cast<inet::NetworkInterface*>(getParentModule()->gate("data_face$o")->getNextGate()->getOwnerModule()->getSubmodule("wlan", 0));
+
+                inet::NetworkInterface *dest_netif = check_and_cast<inet::NetworkInterface*>(getSimulation()->getModuleByPath((const char*) wss.str().c_str())->getSubmodule("wlan", 0));
+
+                packet->addTag<inet::InterfaceReq>()->setInterfaceId(netif->getInterfaceId());
+
+                packet->addTag<inet::MacAddressReq>()->setSrcAddress(dest_netif->getMacAddress());
                 send(packet, "lower_layer$o");
                 delete msg;
                 // send(msg, "lower_layer$o", msg->getArrivalGate()->getIndex());

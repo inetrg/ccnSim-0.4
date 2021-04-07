@@ -1,1 +1,9 @@
 Makefile
+.cmdenv-log
+ccnSim
+ccnSim_debug
+libccnSim.so
+out/
+packets/*.cc
+packets/*.h
+results/
