@@ -79,17 +79,28 @@
 
 
                 std::stringstream wss;
+
+                // take out face index as index for dst host
                 int index = msg->getArrivalGate()->getIndex();
 
+                // prepare string
                 wss << "host[" << index << "]";
 
+                // get network interface of the host assiciated with this node
                 inet::NetworkInterface *netif = check_and_cast<inet::NetworkInterface*>(getParentModule()->gate("data_face$o")->getNextGate()->getOwnerModule()->getSubmodule("wlan", 0));
 
+                // get network interface of the host associated to the node we want to reach (dest)
                 inet::NetworkInterface *dest_netif = check_and_cast<inet::NetworkInterface*>(getSimulation()->getModuleByPath((const char*) wss.str().c_str())->getSubmodule("wlan", 0));
 
+                // tag with associated host interface
                 packet->addTag<inet::InterfaceReq>()->setInterfaceId(netif->getInterfaceId());
 
-                packet->addTag<inet::MacAddressReq>()->setSrcAddress(dest_netif->getMacAddress());
+                // tag with remote host (dest) MAC address
+                packet->addTag<inet::MacAddressReq>()->setDestAddress(dest_netif->getMacAddress());
+
+                // tag with local host source address
+                packet->addTag<inet::MacAddressReq>()->setSrcAddress(netif->getMacAddress());
+
                 send(packet, "lower_layer$o");
                 delete msg;
                 // send(msg, "lower_layer$o", msg->getArrivalGate()->getIndex());
