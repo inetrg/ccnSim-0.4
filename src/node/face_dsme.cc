@@ -69,6 +69,8 @@
                     ccn_interest *tmp_int = (ccn_interest *)msg;
                     auto payload = inet::makeShared<inet::inet_ccn_interest>();
                     payload->setChunk(tmp_int->getChunk());
+                    /* TODO: Chunk shouldn't be zero, otherwise debug mode fails */
+                    payload->setChunkLength(inet::B(1));
 
                     packet->insertAtBack(payload);
                     break;
