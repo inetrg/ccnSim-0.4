@@ -6,6 +6,7 @@
 #include "inet/linklayer/common/InterfaceTag_m.h"
 #include "inet/networklayer/common/NetworkInterface.h"
 #include "inet/linklayer/common/MacAddressTag_m.h"
+#include "inet/common/ProtocolTag_m.h"
 
 #include "ccn_data.h"
 #include "ccn_interest.h"
@@ -96,6 +97,8 @@
 
                 // tag with local host source address
                 packet->addTagIfAbsent<inet::MacAddressReq>()->setSrcAddress(netif->getMacAddress());
+
+                packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::arp);
 
                 send(packet, "lower_layer$o");
                 delete msg;
