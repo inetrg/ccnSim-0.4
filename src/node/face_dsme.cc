@@ -50,7 +50,23 @@
         {
             EV << "RX from lower, send up;" << str  << "\n";
             // find out dst face and send msg there
-            send(msg, "upper_layer$o", msg->getArrivalGate()->getIndex());
+            inet::Packet *packet = check_and_cast<inet::Packet*>(msg);
+            auto payload = packet->removeAtFront<inet::inet_ccn_interest>();
+            switch(payload->getType()) {
+                case CCN_D:
+                    throw cRuntimeError("ERROR");
+                    /* Create and populate CCN data */
+                    break;
+                case CCN_I: {
+                    /* Create and populate CCN interest */
+                    ccn_interest *interest = new ccn_interest("interest",CCN_I);
+                    interest->setChunk(payload->getChunk());
+                    interest->setHops(payload->getHops());
+                    interest->setTarget(payload->getTarget());
+                    break;
+                }
+            }
+            send(msg, "upper_layer$o", payload->getDest_face());
         }
         else {
             EV << "RX from upper, send down;" << str << "\n";
@@ -59,6 +75,9 @@
             int numSent = 666;
             sprintf(msgName, "face_dsme", numSent);
             auto packet = new inet::Packet(msgName);
+            // take out face index as index for dst host
+            int index = msg->getArrivalGate()->getIndex();
+
 
             switch (msg->getKind())
             {
@@ -70,18 +89,20 @@
                     ccn_interest *tmp_int = (ccn_interest *)msg;
                     auto payload = inet::makeShared<inet::inet_ccn_interest>();
                     payload->setChunk(tmp_int->getChunk());
+                    payload->setHops(tmp_int->getHops());
+                    payload->setTarget(tmp_int->getTarget());
+
                     /* TODO: Chunk shouldn't be zero, otherwise debug mode fails */
                     payload->setChunkLength(inet::B(1));
+                    payload->setType(msg->getKind());
+                    payload->setDest_face(getParentModule()->gate("face$o",index)->getNextGate()->getIndex());
 
-                    packet->insertAtBack(payload);
+                    packet->insertAtFront(payload);
                     break;
                 }
                 default:
                     EV << "UNKNOWN MSG TYPE";
             }
-
-                // take out face index as index for dst host
-                int index = msg->getArrivalGate()->getIndex();
 
                 // get network interface of the host assiciated with this node
                 inet::NetworkInterface *netif = check_and_cast<inet::NetworkInterface*>(getParentModule()->gate("data_face$o")->getNextGate()->getOwnerModule()->getSubmodule("wlan", 0));
