@@ -36,8 +36,6 @@ class inet_ccn_interest extends FieldsChunk{
 									// previous one). When an interest is involved in a loop, it will
 									// disappear. In this case, to avoid this, set aggregate to false
 	//</aa>
-    int type;
-    int dest_face;
 }
 
 

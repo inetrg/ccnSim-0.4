@@ -2,6 +2,8 @@
 #include <omnetpp.h>
 
 #include "inet_ccn_interest_m.h"
+#include "inet_ccn_data_m.h"
+#include "ccnsim_inet_info_m.h"
 #include "inet/common/packet/Packet.h"
 #include "inet/linklayer/common/InterfaceTag_m.h"
 #include "inet/networklayer/common/NetworkInterface.h"
@@ -51,19 +53,31 @@
             EV << "RX from lower, send up;" << str  << "\n";
             // find out dst face and send msg there
             inet::Packet *packet = check_and_cast<inet::Packet*>(msg);
-            auto payload = packet->removeAtFront<inet::inet_ccn_interest>();
-            switch(payload->getType()) {
-                case CCN_D:
-                    throw cRuntimeError("ERROR");
+            auto info = packet->removeAtFront<inet::ccnsim_inet_info>();
+            switch(info->getType()) {
+                case CCN_D: {
+                    auto payload = packet->removeAtFront<inet::inet_ccn_data>();
+                    /* Create and populate CCN interest */
+                    ccn_data *data = new ccn_data("data",CCN_D);
+                    data->setHops(payload->getHops());
+                    data->setBtw(payload->getBtw());
+                    data->setTarget(payload->getTarget());
+                    data->setFound(payload->getFound());
+                    data->setCapacity(payload->getCapacity());
+                    data->setTSI(payload->getTSI());
+                    data->setTSB(payload->getTSB());
+                    send(check_and_cast<cMessage*>(data), "upper_layer$o", info->getDest_face());
                     /* Create and populate CCN data */
                     break;
+                }
                 case CCN_I: {
+                    auto payload = packet->removeAtFront<inet::inet_ccn_interest>();
                     /* Create and populate CCN interest */
                     ccn_interest *interest = new ccn_interest("interest",CCN_I);
                     interest->setChunk(payload->getChunk());
                     interest->setHops(payload->getHops());
                     interest->setTarget(payload->getTarget());
-                    send(check_and_cast<cMessage*>(interest), "upper_layer$o", payload->getDest_face());
+                    send(check_and_cast<cMessage*>(interest), "upper_layer$o", info->getDest_face());
                     break;
                 }
             }
@@ -79,11 +93,25 @@
             // take out face index as index for dst host
             int index = msg->getArrivalGate()->getIndex();
 
-
             switch (msg->getKind())
             {
-                case CCN_D:
+                case CCN_D: {
+                    ccn_data *tmp_data = (ccn_data *)msg;
+                    auto payload = inet::makeShared<inet::inet_ccn_data>();
+                    payload->setHops(tmp_data->getHops());
+                    payload->setBtw(tmp_data->getBtw());
+                    payload->setTarget(tmp_data->getTarget());
+                    payload->setFound(tmp_data->getFound());
+                    payload->setCapacity(tmp_data->getCapacity());
+                    payload->setTSI(tmp_data->getTSI());
+                    payload->setTSB(tmp_data->getTSB());
+
+                    /* TODO: Chunk shouldn't be zero, otherwise debug mode fails */
+                    payload->setChunkLength(inet::B(1));
+
+                    packet->insertAtFront(payload);
                     break;
+                    }
 
                 case CCN_I:
                 {
@@ -95,15 +123,17 @@
 
                     /* TODO: Chunk shouldn't be zero, otherwise debug mode fails */
                     payload->setChunkLength(inet::B(1));
-                    payload->setType(msg->getKind());
-                    payload->setDest_face(getParentModule()->gate("face$o",index)->getNextGate()->getIndex());
-
                     packet->insertAtFront(payload);
                     break;
                 }
                 default:
                     EV << "UNKNOWN MSG TYPE";
             }
+
+                auto info = inet::makeShared<inet::ccnsim_inet_info>();
+                info->setType(msg->getKind());
+                info->setDest_face(getParentModule()->gate("face$o",index)->getNextGate()->getIndex());
+                packet->insertAtFront(info);
 
                 // get network interface of the host assiciated with this node
                 inet::NetworkInterface *netif = check_and_cast<inet::NetworkInterface*>(getParentModule()->gate("data_face$o")->getNextGate()->getOwnerModule()->getSubmodule("wlan", 0));
