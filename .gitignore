@@ -1,9 +1,11 @@
-Makefile
+src/Makefile
 .cmdenv-log
 ccnSim
-ccnSim_debug
+ccnSim_dbg
 libccnSim.so
+libccnSim_dbg.so
 out/
-packets/*.cc
-packets/*.h
+src/packets/*.cc
+src/packets/*.h
 results/
+.qtenvrc
