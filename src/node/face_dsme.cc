@@ -63,10 +63,11 @@
                     interest->setChunk(payload->getChunk());
                     interest->setHops(payload->getHops());
                     interest->setTarget(payload->getTarget());
+                    send(check_and_cast<cMessage*>(interest), "upper_layer$o", payload->getDest_face());
                     break;
                 }
             }
-            send(msg, "upper_layer$o", payload->getDest_face());
+            delete msg;
         }
         else {
             EV << "RX from upper, send down;" << str << "\n";
