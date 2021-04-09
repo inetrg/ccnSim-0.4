@@ -27,6 +27,8 @@
         virtual void handleMessage(cMessage *msg) override;
         inet::Packet *ccn_msg_to_inet(cMessage *msg, int dest_face);
         cMessage *inet_to_ccn_msg(inet::Packet *packet, int *dest_face);
+        template <typename T, typename S> void copy_ccn_data(T origin, S dest);
+        template <typename T, typename S> void copy_ccn_interest(T origin, S dest);
     };
 
     // The module class needs to be registered with OMNeT++
@@ -36,6 +38,40 @@
     {
         // Initialize is called at the beginning of the simulation.
         EV << "INIT face_dsme" << "\n";
+    }
+
+    template <typename T, typename S> void face_dsme::copy_ccn_data(T origin, S dest)
+    {
+        dest->setChunk(origin->getChunk());
+        dest->setPrice(origin->getPrice());
+        dest->setTarget(origin->getTarget());
+        dest->setOrigin(origin->getOrigin());
+        dest->setHops(origin->getHops());
+        dest->setTSB(origin->getTSB());
+        dest->setTSI(origin->getTSI());
+        dest->setCapacity(origin->getCapacity());
+        dest->setBtw(origin->getBtw());
+        dest->setFound(origin->getFound());
+    }
+
+    template <typename T, typename S> void face_dsme::copy_ccn_interest(T origin, S dest)
+    {
+        dest->setPathArraySize(origin->getPathArraySize());
+        for (int k=0; k < origin->getPathArraySize(); k++) {
+            dest->setPath(k, origin->getPath(k));
+        }
+        dest->setChunk(origin->getChunk());
+        dest->setHops(origin->getHops());
+        dest->setTarget(origin->getTarget());
+        dest->setRep_target(origin->getRep_target());
+        dest->setBtw(origin->getBtw());
+        dest->setTTL(origin->getTTL());
+        dest->setNfound(origin->getNfound());
+        dest->setCapacity(origin->getCapacity());
+        dest->setOrigin(origin->getOrigin());
+        dest->setDelay(origin->getDelay());
+        dest->setSerialNumber(origin->getSerialNumber());
+        dest->setAggregate(origin->getAggregate());
     }
 
     cMessage *face_dsme::inet_to_ccn_msg(inet::Packet *packet, int *dest_face)
@@ -50,14 +86,8 @@
 
                 /* Create and populate CCN data */
                 ccn_data *data = check_and_cast<ccn_data*>(msg);
+                copy_ccn_data<inet::IntrusivePtr<inet::inet_ccn_data>, ccn_data*>(payload, data);
 
-                data->setHops(payload->getHops());
-                data->setBtw(payload->getBtw());
-                data->setTarget(payload->getTarget());
-                data->setFound(payload->getFound());
-                data->setCapacity(payload->getCapacity());
-                data->setTSI(payload->getTSI());
-                data->setTSB(payload->getTSB());
                 break;
             }
             case CCN_I: {
@@ -65,9 +95,7 @@
                 /* Create and populate CCN interest */
                 msg = new ccn_interest("interest",CCN_I);
                 ccn_interest *interest = check_and_cast<ccn_interest*>(msg);
-                interest->setChunk(payload->getChunk());
-                interest->setHops(payload->getHops());
-                interest->setTarget(payload->getTarget());
+                copy_ccn_interest<inet::IntrusivePtr<inet::inet_ccn_interest>, ccn_interest*>(payload, interest);
                 break;
             }
             default:
@@ -88,13 +116,8 @@
                 packet = new inet::Packet("ccn_data");
                 ccn_data *tmp_data = (ccn_data *)msg;
                 auto payload = inet::makeShared<inet::inet_ccn_data>();
-                payload->setHops(tmp_data->getHops());
-                payload->setBtw(tmp_data->getBtw());
-                payload->setTarget(tmp_data->getTarget());
-                payload->setFound(tmp_data->getFound());
-                payload->setCapacity(tmp_data->getCapacity());
-                payload->setTSI(tmp_data->getTSI());
-                payload->setTSB(tmp_data->getTSB());
+
+                copy_ccn_data<ccn_data*, inet::IntrusivePtr<inet::inet_ccn_data>>(tmp_data, payload);
 
                 /* TODO: Chunk shouldn't be zero, otherwise debug mode fails */
                 payload->setChunkLength(inet::B(1));
@@ -108,9 +131,8 @@
                 packet = new inet::Packet("ccn_interest");
                 ccn_interest *tmp_int = (ccn_interest *)msg;
                 auto payload = inet::makeShared<inet::inet_ccn_interest>();
-                payload->setChunk(tmp_int->getChunk());
-                payload->setHops(tmp_int->getHops());
-                payload->setTarget(tmp_int->getTarget());
+                copy_ccn_interest<ccn_interest*, inet::IntrusivePtr<inet::inet_ccn_interest>>(tmp_int, payload);
+
 
                 /* TODO: Chunk shouldn't be zero, otherwise debug mode fails */
                 payload->setChunkLength(inet::B(1));
