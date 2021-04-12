@@ -1,4 +1,4 @@
-CCNSIM ?= src/$(shell basename $(CURDIR))
+CCNSIM ?= src/ccnSim
 INET_PATH ?= ../../inet
 FLORA_PATH ?= ../../flora
 INET_DSME_PATH ?= ../../inet-dsme
