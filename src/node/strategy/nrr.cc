@@ -56,7 +56,7 @@ void nrr::initialize(){
     strategy_layer::initialize();
     vector<string> ctype;
     // ctype.push_back("modules.node.node");
-	ctype.push_back("ccnsim_dsme.ccnsim_dsme_node");
+	ctype.push_back(getAncestorPar("node_type"));
 	TTL = par("TTL2");
 
     cTopology topo;

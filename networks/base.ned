@@ -12,6 +12,7 @@ network base_network {
     parameters:
         //Number of ccn nodes
     	int n = default(1);
+    	string node_type = default("modules.node.node");
 
 		//Number of repositories
 		string node_repos = default("");//n-1
@@ -40,7 +41,7 @@ network base_network {
 	        @display("p=900,100");
 	}
 
-        node [n]: <default("node")> like Inode; // BorderNode;
+        node [n]: <node_type> like Inode; // BorderNode;
 	//client[n]: client;
 	//**mt**
 	client[n]: <client_type> like IClient {

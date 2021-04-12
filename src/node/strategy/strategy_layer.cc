@@ -220,7 +220,7 @@ void strategy_layer::populate_routing_table()
 
     // Extract topology map
     // types.push_back("modules.node.node");		// We are interested in getting all nodes.
-	types.push_back("ccnsim_dsme.ccnsim_dsme_node");
+	types.push_back(getAncestorPar("node_type"));
 	topo.extractByNedTypeName( types );
     cTopology_mod::Node *node = topo.getNode( getParentModule()->getIndex() ); 	// Taking the reference to the current node.
 
