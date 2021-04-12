@@ -2,6 +2,8 @@ src/Makefile
 .cmdenv-log
 ccnSim
 ccnSim_dbg
+libccnSim.a
+libccnSim_dbg.a
 libccnSim.so
 libccnSim_dbg.so
 out/
