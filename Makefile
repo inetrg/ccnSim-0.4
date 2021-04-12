@@ -41,9 +41,14 @@ define CCNSIM_ARGS
 endef
 
 BUILD_LIB ?= 0
+BUILD_STATIC_LIB ?= 0
 
 ifneq (0, $(BUILD_LIB))
   OPP_MAKEMAKE_ARGS += -s
+endif
+
+ifneq (0, $(BUILD_STATIC_LIB))
+  OPP_MAKEMAKE_ARGS += -a
 endif
 
 CCNSIM_ARGS += $(SIMULATION).ini -c $(CONFIG)
