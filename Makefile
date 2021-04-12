@@ -40,17 +40,6 @@ define CCNSIM_ARGS
 -m $(OMNETPP_EXTRA_ARGS)
 endef
 
-BUILD_LIB ?= 0
-BUILD_STATIC_LIB ?= 0
-
-ifneq (0, $(BUILD_LIB))
-  OPP_MAKEMAKE_ARGS += -s
-endif
-
-ifneq (0, $(BUILD_STATIC_LIB))
-  OPP_MAKEMAKE_ARGS += -a
-endif
-
 CCNSIM_ARGS += $(SIMULATION).ini -c $(CONFIG)
 
 all: checkmakefiles
@@ -86,3 +75,9 @@ debug:
 
 gdb:
 	gdb --args $(CCNSIM)_dbg $(CCNSIM_ARGS)
+
+makefiles-lib:
+	cd src && opp_makemake $(OPP_MAKEMAKE_ARGS) -s
+
+makefiles-static-lib:
+	cd src && opp_makemake $(OPP_MAKEMAKE_ARGS) -a
