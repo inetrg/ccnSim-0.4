@@ -132,11 +132,11 @@ void statistics::initialize(int stage)
 		partial_n = round(partial_n*(double)num_nodes);
 
 
-		cTopology topo;
+		cTopology_mod topo;
 
 		//	Extracting client modules according to the simulated type (IRM or ShotNoise).
 		string clType = getAncestorPar("client_type");
-		string clBase = "modules.clients.";
+		string clBase = getAncestorPar("client_path_prefix");
 		clBase+=clType;
 		clients = new client* [num_clients];
 		clients_id.resize(num_clients);

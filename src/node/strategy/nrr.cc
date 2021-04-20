@@ -59,7 +59,7 @@ void nrr::initialize(){
 	ctype.push_back(getAncestorPar("node_type"));
 	TTL = par("TTL2");
 
-    cTopology topo;
+    cTopology_mod topo;
     topo.extractByNedTypeName(ctype);
     for (int i = 0;i<topo.getNumNodes();i++)
 	{

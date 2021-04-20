@@ -56,6 +56,7 @@ struct pit_entry
     boost::unordered::unordered_set<int> nonces;		// Nonces of the Interest packets aggregated inside the same PIT entry.
     simtime_t time; 				// Last update time of the PIT entry.
     std::bitset<1> cacheable;		// Bit indicating if the retrieved Data packet should be cached or not.
+    std::bitset<1> needs_indication;// PK: when this is set, an uplink indication should be sent
 };
 
 
@@ -77,6 +78,10 @@ class core_layer : public abstract_node{
 
 		// *** Added for model execution with NRR
 		virtual strategy_layer* get_strategy() const;
+        virtual boost::unordered_map <chunk_t, pit_entry > get_PIT() const
+        {
+            return PIT;
+        }
 
 		bool stable;   // Used for collecting load samples only after the stabilization;
 		double datarate;
@@ -95,7 +100,7 @@ class core_layer : public abstract_node{
 
 		void handle_interest(ccn_interest *);
 		void handle_ghost(ccn_interest *);
-		void handle_data(ccn_data *);
+		virtual void handle_data(ccn_data *);
 		void handle_decision(bool *, ccn_interest *);
 
 

@@ -29,6 +29,7 @@ network base_network {
 
 		//**mt**
 		string client_type = default("client_IRM");
+        string client_path_prefix = default("modules.clients.");
 
     submodules:
     	content_distribution: <content_distribution_type> like IContentDistribution{

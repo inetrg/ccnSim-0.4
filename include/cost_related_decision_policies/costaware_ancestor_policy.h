@@ -57,7 +57,7 @@ class Costaware_ancestor: public DecisionPolicy{
 
 		    vector<string> ctype;
 			ctype.push_back("modules.content.WeightedContentDistribution");
-			cTopology topo;
+			cTopology_mod topo;
 	   		topo.extractByNedTypeName(ctype);
 
 			// PK: num_content_distribution_modules undeclared. what is it supposted to be???
@@ -69,7 +69,7 @@ class Costaware_ancestor: public DecisionPolicy{
 			// 	}
 			// #endif
 
-			cTopology::Node *content_distribution_node = topo.getNode(0);
+			cTopology_mod::Node *content_distribution_node = topo.getNode(0);
 			content_distribution_module = 
 					(WeightedContentDistribution*) content_distribution_node->getModule();
 
