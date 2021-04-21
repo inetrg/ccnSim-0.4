@@ -82,6 +82,10 @@ class core_layer : public abstract_node{
         {
             return PIT;
         }
+        virtual base_cache* getContentStore() const
+        {
+            return ContentStore;
+        }
 
 		bool stable;   // Used for collecting load samples only after the stabilization;
 		double datarate;
