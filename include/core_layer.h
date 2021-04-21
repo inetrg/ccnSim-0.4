@@ -78,9 +78,9 @@ class core_layer : public abstract_node{
 
 		// *** Added for model execution with NRR
 		virtual strategy_layer* get_strategy() const;
-        virtual boost::unordered_map <chunk_t, pit_entry > get_PIT() const
+        virtual boost::unordered_map <chunk_t, pit_entry >* get_PIT()
         {
-            return PIT;
+            return &PIT;
         }
         virtual base_cache* getContentStore() const
         {
