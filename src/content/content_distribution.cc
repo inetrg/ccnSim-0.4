@@ -133,48 +133,49 @@ void content_distribution::initialize()
     catalog.resize(newCardF+1); 	// Initialize content catalog.
 
 
-    // *** Repositories initialization ***
-    char name[15];
+	// *** Repositories initialization ***
+	char name[15];
 
-    cStringTokenizer tokenizer(getAncestorPar("node_repos"),",");
-    repositories = init_repos(tokenizer.asIntVector());
+	cStringTokenizer tokenizer(getAncestorPar("node_repos"), ",");
+	repositories = init_repos(tokenizer.asIntVector());
 
-    repo_prices = init_repo_prices();
+	repo_prices = init_repo_prices();
 
-
-    // Useful for statistics: write out the name of each repository within the network.
-    for (int i = 0; i < num_repos; i++){
-		sprintf(name,"repo-%d",i);
-		recordScalar(name,repositories[i]);
-    }
-
-    // *** Clients initialization ***
-    if (num_clients < 0) 	// All nodes of the network will be clients.
-		num_clients = nodes;
-    tokenizer = cStringTokenizer(getAncestorPar("node_clients"),",");
-    clients = init_clients (tokenizer.asIntVector());
-
-    //Useful for statistics: write out the name of each client within the network.
-    for (int i = 0; i < num_clients; i++){
-		sprintf(name,"client-%d",i);
-		recordScalar(name,clients[i]);
-    }
-
-	initialize_repo_popularity();
-
-    // *** Content initialization ***
-    cout<<"Start content initialization..."<<endl;
-    init_content();
-    cout<<"Content initialized"<<endl;
-
-	for (int d = 1; d <= newCardF; d++)
+	// Useful for statistics: write out the name of each repository within the network.
+	for (int i = 0; i < num_repos; i++)
 	{
-		// PK: this doesn't seem to be printed :/
-		// EV << "Content # " << d << endl;
-	}
+		sprintf(name, "repo-%d", i);
+		recordScalar(name, repositories[i]);
+		}
 
-	finalize_total_replica();
-}
+		// *** Clients initialization ***
+		if (num_clients < 0) // All nodes of the network will be clients.
+			num_clients = nodes;
+		tokenizer = cStringTokenizer(getAncestorPar("node_clients"), ",");
+		clients = init_clients(tokenizer.asIntVector());
+
+		//Useful for statistics: write out the name of each client within the network.
+		for (int i = 0; i < num_clients; i++)
+		{
+			sprintf(name, "client-%d", i);
+			recordScalar(name, clients[i]);
+		}
+
+		initialize_repo_popularity();
+
+		// *** Content initialization ***
+		cout << "Start content initialization..." << endl;
+		init_content();
+		cout << "Content initialized" << endl;
+
+		for (int d = 1; d <= newCardF; d++)
+		{
+			// PK: this doesn't seem to be printed :/
+			// EV << "Content # " << d << endl;
+		}
+
+		finalize_total_replica();
+	}
 
 void content_distribution::initialize_repo_popularity()
 {

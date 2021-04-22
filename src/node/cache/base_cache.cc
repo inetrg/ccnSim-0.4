@@ -227,12 +227,14 @@ void base_cache::store(cMessage *in)
 {
 	if (cache_size ==0)		// The cache has Size=0.
 	{
+		EV << "base_cache::store SOZE ZEROOO\n";
 		after_discarding_data();
 		return;
 	}
 
     if (decisor->data_to_cache((ccn_data*)in )) 	// The decision is based on the meta-caching strategy.
     {
+		EV << "base_cache::store STORE DATA\n";
 		decision_yes++;
 		data_store( ( (ccn_data* ) in )->getChunk() ); // Store the received chunk inside the local cache. It is implemented
 													   // by each derived class according to the chosen replacement policy.

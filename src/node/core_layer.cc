@@ -49,6 +49,8 @@ int core_layer::repo_interest = 0;
 
 void core_layer::initialize()
 {
+	for (auto &elem : content_distribution::catalog)
+		EV << "CATALOG: " << elem.info << "\n";
 	//cout << "CORE LAYER INIT" << endl;
 
 	timer_indication = new cMessage("timer_indication", TIMER_INDICATION);
@@ -208,6 +210,7 @@ void core_layer::send_interest_indication(chunk_t chunk, int ogate_idx)
  * 	Core layer handling message. The received packet is classified (Interest or Data)
  * 	and the respective handling functions are called.
  */
+chunk_t chunky;
 void core_layer::handleMessage(cMessage *in)
 {
 #ifdef SEVERE_DEBUG
@@ -245,6 +248,7 @@ void core_layer::handleMessage(cMessage *in)
 		break;
 
 	case CCN_D: // A Data packet is received.
+	{
 		data++;
 
 		data_msg = (ccn_data *)in;
@@ -253,19 +257,24 @@ void core_layer::handleMessage(cMessage *in)
 			data_msg->setHops(data_msg->getHops() + 1);
 
 		handle_data(data_msg);
+		chunky = data_msg->getChunk();
+		if (ContentStore->lookup(chunky))
+		{
+			EV << "YES DATA IN CS\n";
+		}
 		delete in;
 		break;
+	}
+		case LOAD_CHECK:
+			evaluateLinkLoad();
+			scheduleAt(simTime() + maxInterval, in);
+			break;
 
-	case LOAD_CHECK:
-		evaluateLinkLoad();
-		scheduleAt(simTime() + maxInterval, in);
-		break;
+		// send periodic indications from repo nodes
+		case TIMER_INDICATION:
 
-	// send periodic indications from repo nodes
-	case TIMER_INDICATION:
-
-		if (it_has_a_repo_attached)
-		{
+			if (it_has_a_repo_attached)
+			{
 				EV
 			<< "Node [" << getIndex() << "] TIMER_INDICATION at: " << simTime() << "\n ";
 			float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
@@ -287,6 +296,11 @@ void core_layer::handleMessage(cMessage *in)
 
 		ccn_interest *int_message = new ccn_interest("interest", CCN_I);
 
+		// chunky = data_msg->getChunk();
+		if (ContentStore->lookup(chunky))
+		{
+			EV << "INDICATION old chuny still in CS\n";
+		}
 
 		// copy chunk name from incoming interest
 		chunk_t chunk = incoming_msg->getChunk();
@@ -707,6 +721,7 @@ void core_layer::handle_data(ccn_data *data_msg)
 	int copies_sent = 0;
 #endif
 
+	EV << "node[" << getIndex() << "]: handle_data\n ";
 	if (pitIt != PIT.end()) // A PIT entry is found.
 	{
 
@@ -801,6 +816,9 @@ void core_layer::handle_data(ccn_data *data_msg)
 			EV << "node[" << getIndex() << "]: Send indication from cache\n ";
 			send_interest_indication(chunk, 0); // hard coded 0 sends to client in star topology
 		}
+	}
+	else {
+		EV << "node[" << getIndex() << "]: NO PIT ENTRY FOUND\n ";
 	}
 
 // Otherwise the Data is unrequested
