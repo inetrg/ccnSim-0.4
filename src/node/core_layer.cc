@@ -294,46 +294,54 @@ void core_layer::handleMessage(cMessage *in)
 		EV << " int_message->getChunk(): " << incoming_msg->getChunk() << "\n";
 		EV << " int_message->get_name(): " << incoming_msg->get_name() << "\n";
 
-		ccn_interest *int_message = new ccn_interest("interest", CCN_I);
-
-		// chunky = data_msg->getChunk();
-		if (ContentStore->lookup(chunky))
-		{
-			EV << "INDICATION old chuny still in CS\n";
-		}
-
-		// copy chunk name from incoming interest
+		//if not in CS, send upward (CS not implemented here)
 		chunk_t chunk = incoming_msg->getChunk();
-		int_message->setChunk(chunk);
-
-		unordered_map<chunk_t, pit_entry>::iterator pitIt = PIT.find(chunk);
-
-		// Invalidate and re-create a new PIT entry.
-		if (pitIt != PIT.end()) {
-			PIT.erase(chunk);
-		}
-
-		PIT[chunk].time = simTime();
-		PIT[chunk].cacheable.set();
-		// set indication bit in PIT which triggers an uplink interest notification after data arrival
-		PIT[chunk].needs_indication.set();
-
-		// if (int_msg->getTarget() == getIndex())
-		// { // I am the target of this interest but I have no more the object
-			// Therefore, this interest cannot be aggregated with the others
-			// int_msg->setAggregate(false);
-		// }
-
-		bool *decision = strategy->get_decision(int_message);
-		handle_decision(decision, int_message);
-		delete[] decision; //free memory for the decision array
-
-		// PK: not needed since i am the "originator" of this interest
-		// add_to_pit(chunk, incoming_msg->getArrivalGate()->getIndex());
-
-		// delete oroginal interest notification message
+		EV << "node[" << getIndex() << "]: Send indication from cache\n ";
+		send_interest_indication(chunk, 0); // hard coded 0 sends to client in star topology
 		delete in;
 		break;
+
+
+		// ccn_interest *int_message = new ccn_interest("interest", CCN_I);
+
+		// // chunky = data_msg->getChunk();
+		// if (ContentStore->lookup(chunky))
+		// {
+		// 	EV << "INDICATION old chuny still in CS\n";
+		// }
+
+		// // copy chunk name from incoming interest
+		// chunk_t chunk = incoming_msg->getChunk();
+		// int_message->setChunk(chunk);
+
+		// unordered_map<chunk_t, pit_entry>::iterator pitIt = PIT.find(chunk);
+
+		// // Invalidate and re-create a new PIT entry.
+		// if (pitIt != PIT.end()) {
+		// 	PIT.erase(chunk);
+		// }
+
+		// PIT[chunk].time = simTime();
+		// PIT[chunk].cacheable.set();
+		// // set indication bit in PIT which triggers an uplink interest notification after data arrival
+		// PIT[chunk].needs_indication.set();
+
+		// // if (int_msg->getTarget() == getIndex())
+		// // { // I am the target of this interest but I have no more the object
+		// 	// Therefore, this interest cannot be aggregated with the others
+		// 	// int_msg->setAggregate(false);
+		// // }
+
+		// bool *decision = strategy->get_decision(int_message);
+		// handle_decision(decision, int_message);
+		// delete[] decision; //free memory for the decision array
+
+		// // PK: not needed since i am the "originator" of this interest
+		// // add_to_pit(chunk, incoming_msg->getArrivalGate()->getIndex());
+
+		// // delete oroginal interest notification message
+		// delete in;
+		// break;
 	}
 
 	//delete in;
@@ -811,11 +819,11 @@ void core_layer::handle_data(ccn_data *data_msg)
 			interfaces >>= 1;
 		}
 
-		// send indication if pit match has indication bit set
-		if(pitIt->second.needs_indication.test(0)) {
-			EV << "node[" << getIndex() << "]: Send indication from cache\n ";
-			send_interest_indication(chunk, 0); // hard coded 0 sends to client in star topology
-		}
+		// // send indication if pit match has indication bit set
+		// if(pitIt->second.needs_indication.test(0)) {
+		// 	EV << "node[" << getIndex() << "]: Send indication from cache\n ";
+		// 	send_interest_indication(chunk, 0); // hard coded 0 sends to client in star topology
+		// }
 	}
 	else {
 		EV << "node[" << getIndex() << "]: NO PIT ENTRY FOUND\n ";

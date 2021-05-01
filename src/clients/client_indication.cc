@@ -47,13 +47,18 @@ Register_Class (client_indication);
 void client_indication::initialize()
 {
     EV << "CLIENT INDICATION YEAH\n";
-    int num_clients = getAncestorPar("num_clients");
+    check_time = getAncestorPar("check_time");
+
+    timer = new cMessage("timer", TIMER);
+    scheduleAt(simTime() + check_time, timer);
+    
+    // int num_clients = getAncestorPar("num_clients");
     // active = false;
     // if (find(content_distribution::clients, content_distribution::clients + num_clients ,getNodeIndex()) != content_distribution::clients + num_clients)
     // {
-        active = true;
-        // lambda = getAncestorPar("lambda");
-        // check_time	= getAncestorPar("check_time");
+    //     active = true;
+    //     // lambda = getAncestorPar("lambda");
+    //     check_time = getAncestorPar("check_time");
 
         // timer = new cMessage("timer", TIMER);
         // scheduleAt( simTime() + check_time, timer );
@@ -97,7 +102,7 @@ void client_indication::initialize()
         // 		severe_error(__FILE__,__LINE__,ermsg.str().c_str() );
         // 	}
         // }
-        client::initialize();
+    //     client::initialize();
     // }
 }
 
@@ -151,35 +156,37 @@ void client_indication::handleMessage(cMessage *in)
         return;
     }
 
-    switch (in->getKind())		// In case of an external message, it can only be a DATA packet.
-     {
-         case CCN_D:
-         {
-             #ifdef SEVERE_DEBUG
-             if (!active){
-                 std::stringstream ermsg;
-                 ermsg<<"Client attached to node "<<getNodeIndex()<<
-                     "  received a DATA despite being NOT ACTIVE";
-                 severe_error(__FILE__,__LINE__,ermsg.str().c_str() );
-             }
-             #endif
+    switch (in->getKind()) // In case of an external message, it can only be a DATA packet.
+    {
+    case CCN_D:
+    {
+#ifdef SEVERE_DEBUG
+        if (!active)
+        {
+            std::stringstream ermsg;
+            ermsg << "Client attached to node " << getNodeIndex() << "  received a DATA despite being NOT ACTIVE";
+            severe_error(__FILE__, __LINE__, ermsg.str().c_str());
+        }
+#endif
 
-             ccn_data *data_message = (ccn_data *) in;
-             handle_incoming_chunk (data_message);
-             delete  data_message;
-             break;
-         }
-         case INDICATION:
-             ccn_interest *int_message = (ccn_interest *)in;
-             name_t name = int_message->get_name();
-             EV << "CLIENT INDICATION MESSAGE; ";
-            //  EV << "received message: " << in;
-            //  EV << " in->getKind(): " << in->getKind() << "\n";
-             EV << " int_message->getChunk(): " << int_message->getChunk() << "\n";
-             EV << " int_message->get_name(): " << int_message->get_name() << "\n";
-             delete in;
-             send_interest(name, 0, -1);
-             break;
+        ccn_data *data_message = (ccn_data *)in;
+        handle_incoming_chunk(data_message);
+        delete data_message;
+        break;
+    }
+    case INDICATION:
+        ccn_interest *int_message = (ccn_interest *)in;
+        name_t name = int_message->get_name();
+        EV << "CLIENT INDICATION MESSAGE;\n";
+        //  EV << "received message: " << in;
+        //  EV << " in->getKind(): " << in->getKind() << "\n";
+        EV << " int_message->getChunk(): " << int_message->getChunk() << "\n";
+        EV << " int_message->get_name(): " << int_message->get_name() << "\n";
+        delete in;
+        //  send_interest(name, 0, -1);
+
+        request_file(name);
+        break;
 
 #ifdef SEVERE_DEBUG
          default:
@@ -201,15 +208,18 @@ void client_indication::handleMessage(cMessage *in)
  */
 void client_indication::request_file(unsigned long nameC)
 {
+    EV << "CLIENT request_file: " << nameC << "\n";
+
     name_t name;
 
-    if(nameC == newCard+1)  // ED-sim
-        name = content_distribution::zipf[0]->sample();	// Extract a content from the original catalog (rejection-inversion sampling)
-    else					// ModelGraft (TTL_based)
-        name = (name_t) nameC;
+    // if(nameC == newCard+1)  // ED-sim
+    //     name = content_distribution::zipf[0]->sample();	// Extract a content from the original catalog (rejection-inversion sampling)
+    // else					// ModelGraft (TTL_based)
 
-    struct download new_download = download (0,simTime() );
-    #ifdef SEVERE_DEBUG
+    name = (name_t)nameC;
+
+    struct download new_download = download(0, simTime());
+#ifdef SEVERE_DEBUG
     new_download.serial_number = interests_sent;
 
     if (!active){
