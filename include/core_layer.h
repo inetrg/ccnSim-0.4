@@ -102,7 +102,7 @@ class core_layer : public abstract_node{
 		double repo_price;
 		void add_to_pit(chunk_t chunk, int gate);
 
-		void handle_interest(ccn_interest *);
+		virtual void handle_interest(ccn_interest *);
 		void handle_ghost(ccn_interest *);
 		virtual void handle_data(ccn_data *);
 		void handle_decision(bool *, ccn_interest *);
@@ -142,7 +142,7 @@ class core_layer : public abstract_node{
 		unsigned int* percID;
 		int numPercentiles = 11;
 
-    private:
+    protected:
 		unsigned long max_pit;
 		unsigned short nodes;
 		unsigned int my_bitmask;

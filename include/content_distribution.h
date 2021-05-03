@@ -46,6 +46,7 @@
 //
 struct file{
     info_t info;
+    vector<int> cont_repos;
 };
 #pragma pack(pop)
 
@@ -76,7 +77,7 @@ class content_distribution : public cSimpleModule{
 
 
     public:
-		void init_content();
+		virtual void init_content();
 		int *init_repos(vector<int>);
 		virtual double *init_repo_prices();
 		int *init_clients(vector<int>);

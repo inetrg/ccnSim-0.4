@@ -129,7 +129,7 @@ class client : public cSimpleModule {
 		vector<double> validatedReq;		// Number of validated requests for each popularity class.
 
 
-    private:
+    protected:
 
 		double tot_downloads; 		// Number of objects downloaded by the client.
 		unsigned int tot_chunks;
