@@ -249,9 +249,10 @@ vector<unsigned short> content_distribution::binary_strings(int num_ones,int len
 // There is a 1 in the i-th position iff the object is served by the i-th repo
 unsigned short content_distribution::choose_repos (int object_index )
 {
+	// EV << "repo_strings.size(): " << repo_strings.size() <<"\n";
 	unsigned short repo_string = repo_strings[intrand(repo_strings.size())];
 
-	#ifdef SEVERE_DEBUG
+#ifdef SEVERE_DEBUG
 	int num_1_bits =  __builtin_popcount (repo_string); //http://stackoverflow.com/a/109069
 												// Number of bits set to 1 (corresponding 
 												// to the number of repositories this object was 
@@ -280,60 +281,91 @@ void content_distribution::init_content()
 	// Each string represents a replica placement of a certain object among the repositories.
 	// Given a single string, a 1 in the i-th position means that a replica of that object
 	// is placed in the i-th repository.
-    repo_strings = binary_strings(replicas, num_repos);
+    // repo_strings = binary_strings(replicas, num_repos);
 
-    //for (int d = 1; d <= cardF; d++)
-    for (int d = 1; d <= newCardF; d++)
+	EV << "replicas :" << replicas << "num_repos: "<< num_repos<<"\n";
+	EV << "repo_strings.size(): " << repo_strings.size() <<"\n";
+	EV << "sizeof(repo_strings): " << sizeof(repo_strings) << "\n";
+
+	//for (int d = 1; d <= cardF; d++)
+    for (int d = 1; d <= newCardF; d++) // pk: for every unique content item (catalog size) starting from one
     {
     	// 'd' is a content.
 		// Reset the information field of a given content
 		__info(d) = 0;
 
-		// F is the size of a file.
-		if (F > 1){
-			// Set the file size (geometrically distributed).
-			filesize_t s = geometric( 1.0 / F ) + 1;
-			__ssize ( d, s );
-		}else 
-			__ssize( d , 1);
+		// we ignore replicas with this
+		int to_repo=repositories[d % num_repos];
+		content_distribution::catalog[d].cont_repos.push_back(to_repo);
+		// repo_card[to_repo]++;
 
-		vector<int> chosen_repos; 
 
-		// Set the repositories.
-		if (num_repos==1){
-			__srepo ( d , 1 );
-			// Compute the chosen_repo
-			chosen_repos.push_back(0);
-		} else {
-			// Choose a replica placement among all the possible ones.
-			// repos is a replica placement.
-			repo_t repos = choose_repos(d);
-			__srepo (d ,repos);
+		// // F is the size of a file.
+		// if (F > 1){
+		// 	// Set the file size (geometrically distributed).
+		// 	filesize_t s = geometric( 1.0 / F ) + 1;
+		// 	__ssize ( d, s );
+		// }else 
+		// 	__ssize( d , 1);
 
-			// Compute the chosen_repos
-			repo_t repo_extracted = __repo(d);
-			unsigned k = 0;
-			while (repo_extracted)
-			{
-				if (repo_extracted & 1)
-				{
-					chosen_repos.push_back(k);
-					//cout << "Content # " << d << " in Repo # " << repositories[k] << endl;
-				}
-				repo_extracted >>= 1;
-				k++;
-			}
+		// vector<int> chosen_repos;
+
+		// // Set the repositories.
+		// if (num_repos==1){
+		// 	__srepo ( d , 1 );
+		// 	// Compute the chosen_repo
+		// 	chosen_repos.push_back(0);
+		// } else {
+		// 	// Choose a replica placement among all the possible ones.
+		// 	// repos is a replica placement.
+		// 	repo_t repos = choose_repos(d); // pk: which repos should the content go to? max 16
+		// 	__srepo (d ,repos); // pk: set content to these repos. max 16
+
+		// 	// for every chosen repo, set info AND append to repos vector inside cont cata
+
+
+		// 	// Compute the chosen_repos
+		// 	repo_t repo_extracted = __repo(d); // pk: is repo_extracted = repos (above)? YES
+		// 	// EV<<"repos: "<<repos<<" repo_extracted "<<repo_extracted<<"\n";
+		// 	unsigned k = 0;
+		// 	while (repo_extracted) // pk: iterate over all repos of one content. max 16. not every bit has to be one. only those that hold the conten.
+		// 	{
+		// 		if (repo_extracted & 1) // pk: if current repo holds the content
+		// 		{
+		// 			// pk: what is k and what is chosed repos? why inc k when im not the repo?
+		// 			// pk: k is an index for the first 16 repositories in 'repositories'. note that the order of repositories in 'repositories' is not 1,2,3 but "randomized"
+		// 			// idea: k is already an integer based index. it is limited by the number of bits in repo_extracted. so only this needs change?
+		// 			// k: repositories has num:repos size
+		// 			chosen_repos.push_back(k); // append "k" to that repo?
+		// 			EV << "Content # " << d << " in Repo # " << repositories[k] << " idx k: " << k << endl;
+		// 			content_distribution::catalog[d].cont_repos.push_back(repositories[k]);
+		// 		}
+		// 		repo_extracted >>= 1;
+		// 		k++;
+		// 	}
+		// }
+
+		// //EV << "chosen_repos.size():" << chosen_repos.size()<<"\n"; // pk: added this line. size is always 1 even with more replicas?
+		// // Update the repository cardinality
+		// for (unsigned repo_idx = 0; repo_idx < chosen_repos.size(); repo_idx++)
+		// 	repo_card[chosen_repos[repo_idx]]++;
+	}
+
+	// print catalog
+	for (int i = 0; i < content_distribution::catalog.size(); i++)
+	{
+		EV << "Content #"<< i<< "; info value: "<< content_distribution::catalog[i].info<<endl;
+		for (int j = 0; j < content_distribution::catalog[i].cont_repos.size(); j++)
+		{
+			EV << "  Repo #: " << content_distribution::catalog[i].cont_repos[j] << endl;
 		}
-
-		// Update the repository cardinality
-		for (unsigned repo_idx = 0; repo_idx < chosen_repos.size(); repo_idx++)
-					repo_card[ chosen_repos[repo_idx] ] ++;
-
-    }
+	}
 
 	// Record the repository cardinality and price
 	for (int repo_idx = 0; repo_idx < num_repos; repo_idx++){
 	    char name[15];
+		EV<<"repo_card["<<repo_idx<<"]: "<<repo_card[repo_idx]<<"\n";
+
 		sprintf(name,"repo-%d_card",repo_idx);
 		recordScalar(name, repo_card[repo_idx] );
 

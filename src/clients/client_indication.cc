@@ -46,7 +46,7 @@ Register_Class (client_indication);
 
 void client_indication::initialize()
 {
-    EV << "CLIENT INDICATION YEAH\n";
+    // EV << "CLIENT INDICATION YEAH\n";
     check_time = getAncestorPar("check_time");
 
     timer = new cMessage("timer", TIMER);

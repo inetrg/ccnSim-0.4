@@ -46,6 +46,7 @@
 //
 struct file{
     info_t info;
+	vector<int> cont_repos;
 };
 #pragma pack(pop)
 
@@ -103,7 +104,7 @@ class content_distribution : public cSimpleModule{
 
     private:
 		vector<unsigned short> repo_strings; 	// Temporary variable used to generate content displacement among repos.
-		
+
 		int num_clients;
 		int nodes;
 		int F;

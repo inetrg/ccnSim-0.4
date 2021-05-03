@@ -79,16 +79,20 @@ public:
 	    vector<int> repos;
 	    int i;
 
-	    repo = __repo(__id(chunk_var));
-	    i = 0;
+		for (const auto &repos_extracted : content_distribution::catalog[__id(chunk_var)].cont_repos)
+		{
+			repos.push_back(repos_extracted);
+		}
+		// repo = __repo(__id(chunk_var));
+		// i = 0;
 
-	    while (repo)
-	    {
-			if (repo & 1) 
-				repos.push_back(content_distribution::repositories[i]);
-			repo >>= 1;
-			i++;
-	    }
+		// while (repo)
+		// {
+		// 	if (repo & 1)
+		// 		repos.push_back(content_distribution::repositories[i]);
+		// 	repo >>= 1;
+		// 	i++;
+		// }
 
 		//<aa>
 		#ifdef SEVERE_DEBUG
@@ -101,9 +105,7 @@ public:
 		//</aa>
 
 	    return repos;
-	}
-
-	
+		}
 };
 Register_Class(ccn_interest);
 #endif 

@@ -136,9 +136,11 @@ class core_layer : public abstract_node{
 
     private:
 		void send_interest_indication(chunk_t chunk, int ogate_idx);
+		int i_am_src_repo(name_t chunk);
 		unsigned long max_pit;
 		unsigned short nodes;
 		unsigned int my_bitmask;
+		int my_repo_number;
 		double my_btw;
 		double RTT;
 

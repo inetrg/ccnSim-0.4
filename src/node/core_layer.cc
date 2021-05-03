@@ -49,8 +49,8 @@ int core_layer::repo_interest = 0;
 
 void core_layer::initialize()
 {
-	for (auto &elem : content_distribution::catalog)
-		EV << "CATALOG: " << elem.info << "\n";
+	// for (auto &elem : content_distribution::catalog)
+	// 	EV << "CATALOG: " << elem.info << "\n";
 	//cout << "CORE LAYER INIT" << endl;
 
 	timer_indication = new cMessage("timer_indication", TIMER_INDICATION);
@@ -74,30 +74,50 @@ void core_layer::initialize()
 
 	int i = 0;
 	my_bitmask = 0;
+	my_repo_number = -1;
 	for (i = 0; i < num_repos; i++)
 	{
 		if (content_distribution::repositories[i] == getIndex())
 		{
 			EV << "I AM REPO\n";
-			// j is counter and content name?
+			// // j is counter and content name?
 			int j = 0;
-			for (auto c = content_distribution::catalog.begin(); c != content_distribution::catalog.end(); ++c)
-			{
-				// my repsository in bitmask format
-				unsigned short bitmask = (1 << i);
+			// for (auto c = content_distribution::catalog.begin(); c != content_distribution::catalog.end(); ++c)
+			// {
+			// for (const auto &c : content_distribution::catalog)
+			// {
+					// 	// my repsository in bitmask format
+					// 	unsigned short bitmask = (1 << i);
 
-				if (bitmask & __repo(j))
+					// 	if (bitmask & __repo(j))
+					// 	{
+					// 		// append to vector
+					// 		my_contents.push_back(j);
+					// 		// EV << "My contents:  " << j << "\n";
+					// 	}
+					// 	j++;
+					// EV << "c: " << c.info << endl;
+				// }
+
+			// EV << "content_distribution::catalog.size(): " << content_distribution::catalog.size() << endl;
+			for (const auto &conts : content_distribution::catalog)
+			{
+				for (const auto &repos : conts.cont_repos)
 				{
-					// append to vector
-					my_contents.push_back(j);
-					// EV << "My contents:  " << j << "\n";
+					EV << "ME: " << getIndex() << " iter repo: " << repos << endl;
+					// repo assigned to content is me?
+					if (repos == getIndex())
+					{
+						// EV << "My contents:  " << j << "\n";
+						my_contents.push_back(j);
+					}
 				}
 				j++;
 			}
 
-// #ifdef SEVERE_DEBUG
+			// #ifdef SEVERE_DEBUG
 			it_has_a_repo_attached = true;
-// #endif
+			// #endif
 
 			repo_price = content_distribution::repo_prices[i];
 			break;
@@ -107,12 +127,18 @@ void core_layer::initialize()
 	}
 
 	// print the contents of this repo
-	for (std::size_t i = 0; i < my_contents.size(); ++i)
-	{
-		EV << "my_contents[" << i << "]: " << my_contents[i] << "\n";
+	if (my_contents.size()) {
+		for (std::size_t i = 0; i < my_contents.size(); ++i)
+		{
+			EV << "my_contents[" << i << "]: " << my_contents[i] << "\n";
+		}
+	}
+	else{
+		EV<< "I GOT NO CONTENT :(\n";
 	}
 
 	my_bitmask = (1 << i); // Recall that the width of the repository bitset is only num_repos.
+	my_repo_number = getIndex();
 
 	// Initialize pointers to Content Store and Strategy Layer.
 	ContentStore = (base_cache *)gate("cache_port$o")->getNextGate()->getOwner();
@@ -273,7 +299,7 @@ void core_layer::handleMessage(cMessage *in)
 		// send periodic indications from repo nodes
 		case TIMER_INDICATION:
 
-			if (it_has_a_repo_attached)
+			if (it_has_a_repo_attached && my_contents.size())
 			{
 				EV
 			<< "Node [" << getIndex() << "] TIMER_INDICATION at: " << simTime() << "\n ";
@@ -392,13 +418,26 @@ void core_layer::finish()
 	cancelAndDelete(timer_indication);
 }
 
-/*
+int core_layer::i_am_src_repo(name_t name)
+{
+	EV << "i_am_src_repo START\n";
+	for (const auto &repos : content_distribution::catalog[name].cont_repos)
+	{
+		if (repos == my_repo_number) {
+			EV << "i_am_src_repo return 1\n";
+			return 1;
+		}
+	}
+	EV << "i_am_src_repo return 0\n";
+	return 0;
+}
+	/*
  * Interest handling. The order will be:
  *    a) Check inside Content Store.
  *    b) Check inside the attached Repo (if present).
  *    c) Check inside the PIT and, eventually, create an entry and forward the Interest.
  */
-void core_layer::handle_interest(ccn_interest *int_msg)
+	void core_layer::handle_interest(ccn_interest *int_msg)
 {
 #ifdef SEVERE_DEBUG
 	client *cli = __get_attached_client(int_msg->getArrivalGate()->getIndex());
@@ -529,8 +568,9 @@ void core_layer::handle_interest(ccn_interest *int_msg)
 		check_if_correct(__LINE__);
 #endif
 	}
-	else if (my_bitmask & __repo(int_msg->get_name())) // b) Lookup inside the attached repo if I am supposed
+	//else if (my_bitmask & __repo(int_msg->get_name())) // b) Lookup inside the attached repo if I am supposed
 													   //	   to be the source for the requested content.
+	else if (i_am_src_repo(int_msg->get_name()))
 	{
 		// *** Logging MISS EVENT with timestamp
 		//cout << SIMTIME_DBL(simTime()) << "\tNODE\t" << getIndex() << "\t_MISS_\t" << __id(chunk) << endl;

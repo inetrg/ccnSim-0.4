@@ -4,14 +4,14 @@ network star_network extends base_network
 {
     parameters:
         //Number of ccn nodes
-        n = 2;
+        n =21;
 
         //Number of repositories
         // node_repos = "1,2,3,4,5,6,7,8,9";
         // num_repos = 9;
         // node_repos="2,4,6,8";
-        node_repos="1";
-        num_repos = 1;
+        node_repos="1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20";
+        num_repos = 20;
         replicas = 1;
 
         //Number of clients
