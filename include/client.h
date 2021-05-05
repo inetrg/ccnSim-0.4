@@ -55,7 +55,8 @@ struct download {
 	#endif
 	//</aa>
 
-    download (double m = 0,simtime_t t = 0):chunk(m),start(t),last(t){;}
+    int retries;
+    download (double m = 0,simtime_t t = 0):chunk(m),start(t),last(t), retries(0){;}
 };
 
 // Struct used to gather statistics for each single file
